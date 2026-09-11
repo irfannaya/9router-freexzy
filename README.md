@@ -85,20 +85,31 @@ Result: Never stop coding, minimal cost + 20-40% token savings via RTK
 
 ## ⚡ Quick Start
 
-**1. Install globally:**
+### 🐳 Run with Docker (Recommended for Freexzy Edition)
 
 ```bash
-npm install -g 9router
-9router
+# 1. Clone this repository
+git clone https://github.com/irfannaya/9router-freexzy.git
+cd 9router-freexzy
+
+# 2. Build and run with Docker Compose
+docker compose up -d --build
+```
+> 🎉 Dashboard opens instantly at **`http://localhost:20128`**! Data persists automatically in Docker volume `9router-data`.
+
+### 📦 Run from Source (Node.js 18+)
+
+```bash
+git clone https://github.com/irfannaya/9router-freexzy.git
+cd 9router-freexzy
+npm install
+npm run build
+npm start
 ```
 
-🎉 Dashboard opens at `http://localhost:20128`
+---
 
-**2. Connect a FREE provider (no signup needed):**
-
-Dashboard → Providers → Connect **Kiro AI** (~50 credits/month free: Claude 4.5 + GLM-5 + MiniMax) or **OpenCode Free** (no auth) → Done!
-
-**3. Use in your CLI tool:**
+### 🔌 Connect Providers & Use in Your Tools
 
 ```
 Claude Code/Codex/OpenClaw/Cursor/Cline Settings:
@@ -1518,6 +1529,8 @@ Thanks to all contributors who helped make 9Router better!
 
 Built on the shoulders of giants:
 
+- **[9Router](https://github.com/decolua/9router)** by **[@decolua](https://github.com/decolua)** — the original JavaScript router and token saver this custom distribution is built upon.
+- **[9router-mibp-version](https://github.com/mhiqrambg/9router-mibp-version)** by **[@mhiqrambg](https://github.com/mhiqrambg)** — Cline free-tier exploration and model catalog insights.
 - **[CLIProxyAPI](https://github.com/router-for-me/CLIProxyAPI)** — original Go implementation that inspired this JavaScript port.
 - **[RTK](https://github.com/rtk-ai/rtk)** ![Stars](https://img.shields.io/github/stars/rtk-ai/rtk?style=flat&color=yellow) — Rust token-saver. 9Router ports its compression pipeline to JS → **−20-40% input tokens** on every request.
 - **[Caveman](https://github.com/JuliusBrussee/caveman)** ![Stars](https://img.shields.io/github/stars/JuliusBrussee/caveman?style=flat&color=yellow) by **[@JuliusBrussee](https://github.com/JuliusBrussee)** — viral _"why use many token when few token do trick"_. 9Router adapts its prompt → **−65% output tokens**.
