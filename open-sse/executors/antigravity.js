@@ -527,18 +527,47 @@ export class AntigravityExecutor extends BaseExecutor {
 
     // Single functionDeclarations group: client tools first, then decoys
     return {
-      cloakedBody: {
-        ...body,
-        request: {
-          ...body.request,
-          tools: [{ functionDeclarations: allDeclarations }],
-          contents: cloakedContents || body.request.contents
-        }
-      },
-      toolNameMap
+    cloakedBody: {
+      ...body,
+      request: {
+        ...body.request,
+        tools: [{ functionDeclarations: allDeclarations }],
+        contents: cloakedContents || body.request.contents
+      }
+    },
+    toolNameMap
     };
-  }
-}
+    }
+
+    // Parse error responses from Google Cloud Code, extracting validation/activation URLs on 403
+    parseError(response, bodyText) {
+    try {
+    const json = JSON.parse(bodyText);
+    const details = json.error?.details || [];
+    const errorInfo = details.find(d => d.metadata?.validation_url) || details.find(d => d.links?.some(l => l.url));
+    let validationUrl = errorInfo?.metadata?.validation_url || errorInfo?.links?.[0]?.url;
+    if (!validationUrl && Array.isArray(json.ineligibleTiers)) {
+      validationUrl = json.ineligibleTiers.find(t => t.validationUrl)?.validationUrl;
+    }
+
+    if (validationUrl) {
+      console.log("\n=======================================================");
+      console.log("🔐 [ANTIGRAVITY] VERIFICATION REQUIRED FOR ACCOUNT!");
+      console.log("👉 URL:", validationUrl);
+      console.log("=======================================================\n");
+      return {
+        status: response.status,
+        message: `Verify your account to continue. Verification URL: ${validationUrl}`,
+        validationUrl
+      };
+    }
+    const msg = json.error?.message || json.message || `HTTP ${response.status}`;
+    return { status: response.status, message: msg };
+    } catch {
+    return { status: response.status, message: bodyText || `HTTP ${response.status}` };
+    }
+    }
+    }
 
 // AG decoy tools — same names as AG native defaults, redirect to _ide suffixed tools
 const AG_DECOY_TOOLS = [
