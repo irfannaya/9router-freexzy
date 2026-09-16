@@ -136,6 +136,37 @@ export function parseSSEToOpenAIResponse(rawSSE, fallbackModel) {
   let usage = null;
 
   for (const chunk of chunks) {
+    // Support Gemini / Antigravity streaming SSE format
+    if (chunk?.response?.candidates?.[0]) {
+      const candidate = chunk.response.candidates[0];
+      for (const part of candidate.content?.parts || []) {
+        if (part.thought) {
+          if (typeof part.text === "string" && part.text.length > 0) reasoningParts.push(part.text);
+        } else if (typeof part.text === "string" && part.text.length > 0) {
+          contentParts.push(part.text);
+        } else if (part.functionCall) {
+          const idx = toolCallMap.size;
+          toolCallMap.set(idx, {
+            id: part.functionCall.id || `call_${part.functionCall.name}_${Date.now()}_${idx}`,
+            type: "function",
+            function: {
+              name: part.functionCall.name,
+              arguments: typeof part.functionCall.args === "string" ? part.functionCall.args : JSON.stringify(part.functionCall.args || {})
+            }
+          });
+        }
+      }
+      if (candidate.finishReason) finishReason = candidate.finishReason.toLowerCase();
+      if (chunk.response.usageMetadata) {
+        usage = {
+          prompt_tokens: chunk.response.usageMetadata.promptTokenCount || 0,
+          completion_tokens: chunk.response.usageMetadata.candidatesTokenCount || 0,
+          total_tokens: chunk.response.usageMetadata.totalTokenCount || 0
+        };
+      }
+      continue;
+    }
+
     const choice = chunk?.choices?.[0];
     const delta = choice?.delta || {};
     if (typeof delta.content === "string" && delta.content.length > 0) contentParts.push(delta.content);
