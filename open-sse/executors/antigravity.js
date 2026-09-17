@@ -551,10 +551,10 @@ export class AntigravityExecutor extends BaseExecutor {
     }
 
     if (validationUrl) {
-      console.log("\n=======================================================");
-      console.log("🔐 [ANTIGRAVITY] VERIFICATION REQUIRED FOR ACCOUNT!");
-      console.log("👉 URL:", validationUrl);
-      console.log("=======================================================\n");
+      console.error("\n=======================================================");
+      console.error("🔐 [ANTIGRAVITY] VERIFICATION REQUIRED FOR ACCOUNT!");
+      console.error("👉 URL:", validationUrl);
+      console.error("=======================================================\n");
       return {
         status: response.status,
         message: `Verify your account to continue. Verification URL: ${validationUrl}`,

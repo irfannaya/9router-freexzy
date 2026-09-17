@@ -439,6 +439,9 @@ export async function handleChatCore({ body, modelInfo, credentials, log, onCred
             providerResponse = retryResult.response;
             providerUrl = retryResult.url;
             providerResponseFormat = retryResult.responseFormat || targetFormat;
+          } else {
+            providerResponse = retryResult.response;
+            providerUrl = retryResult.url;
           }
         } catch { log?.warn?.("TOKEN", `${provider.toUpperCase()} | retry after refresh failed`); }
       } else {

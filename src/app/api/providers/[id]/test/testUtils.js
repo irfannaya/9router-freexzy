@@ -206,9 +206,33 @@ async function probeCloudCodeAssistAccess(connection, accessToken, effectiveProx
     body: CLOUD_CODE_ASSIST_TEST_BODY,
   }, effectiveProxy);
 
+  const bodyText = await res.text().catch(() => "");
+  let valUrl = null;
+  try {
+    const json = JSON.parse(bodyText);
+    const details = json?.error?.details || [];
+    const errorInfo = details.find(d => d.metadata?.validation_url) || details.find(d => d.links?.some(l => l.url));
+    valUrl = errorInfo?.metadata?.validation_url || errorInfo?.links?.[0]?.url;
+    if (!valUrl && Array.isArray(json?.ineligibleTiers)) {
+      valUrl = json.ineligibleTiers.find(t => t.validationUrl)?.validationUrl;
+    }
+  } catch {}
+
+  if (valUrl) {
+    console.error("\n=======================================================");
+    console.error(`🔐 [ANTIGRAVITY] VERIFICATION REQUIRED FOR ${connection?.email || connection?.id}!`);
+    console.error("👉 URL:", valUrl);
+    console.error("=======================================================\n");
+    return {
+      valid: false,
+      error: `Verify your account: ${valUrl}`,
+      validationUrl: valUrl,
+      status: res.status || 403,
+    };
+  }
+
   if (res.ok) return { valid: true, error: null };
 
-  const bodyText = await res.text().catch(() => "");
   return {
     valid: false,
     error: parseProviderErrorMessage(bodyText, `API returned ${res.status}`),
