@@ -97,15 +97,48 @@ docker compose up -d --build
 ```
 > 🎉 Dashboard opens instantly at **`http://localhost:20128`**! Data persists automatically in Docker volume `9router-data`.
 
-### 📦 Run from Source (Node.js 18+)
+### 📦 Run from Source (Node.js 22.5+ or Bun)
+
+> ⚠️ **CRITICAL REQUIREMENT**: 9Router uses a SQLite database layer. Use **Node.js ≥ 22.5.0** (Node 22 LTS recommended) or **Bun**. Node.js ≥ 22.5 includes built-in `node:sqlite` out-of-the-box with **zero** C++ build tools required. Running on Node < 22.5 will trigger `[DB] No SQLite driver available (bun/better/node/sql.js all failed)` unless native build tools (`python`, `make`, `g++` / Visual C++) are installed.
 
 ```bash
+# 1. Verify Node.js version (must be >= 22.5.0)
+node -v
+
+# 2. Clone repository & install dependencies
 git clone https://github.com/irfannaya/9router-freexzy.git
 cd 9router-freexzy
 npm install
+
+# 3. Build and run production server
 npm run build
 npm start
 ```
+
+#### 🛠️ Troubleshooting: `[DB] No SQLite driver available`
+
+If you encounter this error when connecting a provider or starting the app:
+
+1. **Option 1 (Recommended): Upgrade to Node.js 22.5+**
+   ```bash
+   # Via nvm:
+   nvm install 22
+   nvm use 22
+   npm start
+   ```
+2. **Option 2: Run via Bun (Instant native SQLite)**
+   ```bash
+   bun install
+   bun run dev:bun
+   ```
+3. **Option 3: Install `better-sqlite3` manually (requires C++ build tools)**
+   ```bash
+   npm install better-sqlite3
+   ```
+4. **Option 4: Run via Docker (Zero dependency worries)**
+   ```bash
+   docker compose up -d --build
+   ```
 
 ---
 
