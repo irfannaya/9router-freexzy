@@ -119,9 +119,19 @@ function ConnectionRow({ connection, proxyPools, isOAuth, isFirst, isLast, onMov
             </Badge>
             {hasAnyProxy && <Badge variant={proxyBadgeVariant} size="sm">Proxy</Badge>}
             {isCooldown && connection.isActive !== false && <CooldownTimer until={modelLockUntil} />}
-            {connection.lastError && connection.isActive !== false && (
+            {connection.validationUrl || (connection.lastError && (connection.lastError.includes("http://") || connection.lastError.includes("https://"))) ? (
+              <a
+                href={connection.validationUrl || (connection.lastError.match(/https?:\/\/[^\s"'<>]+/)?.[0])}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 rounded bg-amber-500/20 px-2 py-0.5 text-xs font-semibold text-amber-500 hover:bg-amber-500/30 underline"
+                title="Buka Link Verifikasi / Aktivasi Google"
+              >
+                🔐 Verifikasi Akun
+              </a>
+            ) : connection.lastError && connection.isActive !== false ? (
               <span className="text-xs text-red-500 truncate max-w-[300px]" title={connection.lastError}>{connection.lastError}</span>
-            )}
+            ) : null}
             <span className="text-xs text-text-muted">#{connection.priority}</span>
           </div>
           {hasAnyProxy && (
