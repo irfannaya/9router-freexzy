@@ -19,6 +19,7 @@ for (const entry of REGISTRY) {
 
 const BUILTIN_MODEL_ALIASES = {
   "grok-build": "gcli/grok-build",
+  "grok-4.7": "gcli/grok-4.7",
 };
 
 /**
@@ -129,6 +130,7 @@ const MODEL_PREFIX_PROVIDERS = [
   [/^gpt-/, "openai"],
   [/^o[134]/, "openai"],
   [/^deepseek-/, "openrouter"],
+  [/^grok-/, "gcli"],
 ];
 
 /**
