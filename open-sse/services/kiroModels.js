@@ -164,10 +164,26 @@ async function fetchKiroCatalogRaw(credentials, signal) {
   if (profileArn) params.set("profileArn", profileArn);
   const url = `https://q.${region}.amazonaws.com/ListAvailableModels?${params.toString()}`;
 
+  const authMethod = credentials?.providerSpecificData?.authMethod;
+  const isApiKey = authMethod === "api_key";
+  const isExternalIdp = authMethod === "external_idp";
+
   const headers = {
     ...buildKiroFingerprintHeaders(credentials),
     "Authorization": `Bearer ${credentials?.accessToken || ""}`
   };
+
+  if (isApiKey) {
+    headers["TokenType"] = "API_KEY";
+  } else if (isExternalIdp) {
+    headers["TokenType"] = "EXTERNAL_IDP";
+  }
+  if (credentials?.accessToken) {
+    headers["x-amz-sso-bearer"] = credentials.accessToken;
+  }
+  if (profileArn) {
+    headers["x-amzn-codewhisperer-profile-arn"] = profileArn;
+  }
 
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort("timeout"), FETCH_TIMEOUT_MS);
@@ -252,8 +268,8 @@ export async function resolveKiroModels(credentials, options = {}) {
   try {
     raw = await fetchKiroCatalogRaw(credentials, options.signal);
   } catch (err) {
-    if (err && err.status === 401 && credentials.refreshToken) {
-      options.log?.info?.("KIRO_MODELS", "Got 401 from Kiro; refreshing token");
+    if (err && (err.status === 401 || err.status === 403) && credentials.refreshToken) {
+      options.log?.info?.("KIRO_MODELS", "Got 401/403 from Kiro; refreshing token");
       const refreshed = await refreshKiroToken(
         credentials.refreshToken,
         credentials.providerSpecificData,
