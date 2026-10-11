@@ -1,4 +1,5 @@
 import { PROVIDERS } from "../providers/index.js";
+import { resolveProviderAlias } from "../services/model.js";
 
 /**
  * Unwrap Cline's non-stream envelope: {"success":true,"data":{...choices...}}.
@@ -12,8 +13,13 @@ import { PROVIDERS } from "../providers/index.js";
  * @returns {object} The inner `data` object, or `body` unchanged
  */
 export function unwrapClineEnvelope(body, provider) {
-  if (!provider || !PROVIDERS[provider]?.quirks?.clineEnvelope) return body;
-  const { success, data } = body || {};
+  if (!body || typeof body !== "object") return body;
+  const resolvedProvider = provider ? (resolveProviderAlias(provider) || provider) : null;
+  const isCline = resolvedProvider === "cline" || resolvedProvider === "clinepass";
+  const hasQuirk = isCline || Boolean(PROVIDERS[resolvedProvider]?.quirks?.clineEnvelope);
+
+  if (!hasQuirk) return body;
+  const { success, data } = body;
   if (success !== true || !data || typeof data !== "object" || Array.isArray(data)) return body;
   return data;
 }

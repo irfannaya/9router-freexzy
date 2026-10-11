@@ -41,7 +41,13 @@ export default {
     },
   },
   models: [
-    // Opus (added per kiro.dev/changelog/models and kiro.dev/docs/models)
+    // Opus 5.5 — experimental preview, 1M context, 2x credits (#4410)
+    // Announced 2026-09-22; confirmed in kiro.dev session UI.
+    { id: "claude-opus-5.5", name: "Claude Opus 5.5" },
+    { id: "claude-opus-5.5-thinking", name: "Claude Opus 5.5 (Thinking)" },
+    { id: "claude-opus-5.5-agentic", name: "Claude Opus 5.5 (Agentic)" },
+    { id: "claude-opus-5.5-thinking-agentic", name: "Claude Opus 5.5 (Thinking + Agentic)" },
+    // Opus 5
     { id: "claude-opus-5", name: "Claude Opus 5" },
     { id: "claude-opus-5-thinking", name: "Claude Opus 5 (Thinking)" },
     { id: "claude-opus-5-agentic", name: "Claude Opus 5 (Agentic)" },
@@ -58,6 +64,11 @@ export default {
     { id: "claude-opus-4.5-thinking", name: "Claude Opus 4.5 (Thinking)" },
     { id: "claude-opus-4.5-agentic", name: "Claude Opus 4.5 (Agentic)" },
     { id: "claude-opus-4.5-thinking-agentic", name: "Claude Opus 4.5 (Thinking + Agentic)" },
+    // Sonnet 5.5
+    { id: "claude-sonnet-5.5", name: "Claude Sonnet 5.5" },
+    { id: "claude-sonnet-5.5-thinking", name: "Claude Sonnet 5.5 (Thinking)" },
+    { id: "claude-sonnet-5.5-agentic", name: "Claude Sonnet 5.5 (Agentic)" },
+    { id: "claude-sonnet-5.5-thinking-agentic", name: "Claude Sonnet 5.5 (Thinking + Agentic)" },
     // Sonnet
     { id: "claude-sonnet-5", name: "Claude Sonnet 5" },
     { id: "claude-sonnet-4.5", name: "Claude Sonnet 4.5" },

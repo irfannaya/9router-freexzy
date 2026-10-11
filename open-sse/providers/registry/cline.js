@@ -23,6 +23,7 @@ export default {
       "HTTP-Referer": "https://cline.bot",
       "X-Title": "Cline",
     },
+    quirks: { clineEnvelope: true },
     tokenUrl: "https://api.cline.bot/api/v1/auth/token",
     refreshUrl: "https://api.cline.bot/api/v1/auth/refresh",
     auth: {
@@ -52,9 +53,13 @@ export default {
     // or upstream 403s with "only available via Cline product surfaces".
     { id: "cline-free/muse-spark-1.3-contributor", name: "Muse Spark 1.3 (Free)" },
     { id: "deepseek/deepseek-v4-flash", name: "DeepSeek V4 Flash (Free)" },
+    { id: "deepseek/deepseek-v4.1-flash", name: "DeepSeek V4.1 Flash (Free)" },
     { id: "z-ai/glm-5.3-flash", name: "GLM 5.3 Flash (Free)" },
-    { id: "cline-free/solar-pro4", name: "Solar Pro 4 (Free)" },
-    { id: "cline-free/longcat-2.0", name: "LongCat 2.0 (Free)" },
+    { id: "cline-free/mimo-v2.6-flash", name: "Mimo V2.6 Flash (Free)" },
+    { id: "cline-free/step-5-preview", name: "Step 5 Preview (Free)" },
+    { id: "cline-free/solar-mini4", name: "Solar Mini 4 (Free)" },
+    { id: "cline-free/solar-pro4", name: "Solar Pro 4 (Free)", upstreamModelId: "cline-free/solar-mini4" },
+    { id: "cline-free/longcat-2.0", name: "LongCat 2.0 (Free)", upstreamModelId: "cline-free/step-5-preview" },
     { id: "poolside/laguna-s-2.1:free", name: "Laguna S 2.1 (Free)" },
   ],
   oauth: {

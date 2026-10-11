@@ -23,18 +23,6 @@
 
 ---
 
-> ⚡ **9Router Freexzy Custom Edition** (v0.5.75-custom)
->
-> An enhanced production build with battle-tested fixes for stability, anti-ban account management, and free-tier access:
-> - 🎯 **Antigravity Strict Turn Sanitizer & Dummy Tool Injection**: Fixes Google Cloud Code HTTP 400 errors when function calls/responses are out of sync.
-> - 🛡️ **Fail-Soft Single-Account Priority & 5s Circuit Breaker**: Replaces harsh 15-minute persistent account lockouts with a 5s fast retry. Designed for human-like single active account usage to prevent automated abuse bans.
-> - 🆓 **Cline Free-Tier Models ($0 Usage)**: Built-in support for `deepseek-v4-flash`, `glm-5.3-flash`, `solar-pro4`, `longcat-2.0`, and `laguna-s-2.1:free` with `cline-cli` client header spoofing to bypass HTTP 403 blocks. Supports both standalone API keys (`sk_...`) and OAuth tokens.
-> - 🔄 **Grok xAI CLI Device-Code Auto-Refresh**: Background refresh loop for Grok web sessions.
-> - 📦 **Standalone Docker Bundling Fixes**: Solves Node.js ESM/CJS interop for `node-machine-id`, `uuid`, and `jose`.
-> - 📖 Check out [UPGRADE_GUIDE.md](./UPGRADE_GUIDE.md) for 1-command upstream rebase workflow!
-
----
-
 ## 🤔 Why 9Router?
 
 **Stop wasting money, tokens and hitting limits:**
@@ -85,64 +73,20 @@ Result: Never stop coding, minimal cost + 20-40% token savings via RTK
 
 ## ⚡ Quick Start
 
-### 🐳 Run with Docker (Recommended for Freexzy Edition)
+**1. Install globally:**
 
 ```bash
-# 1. Clone this repository
-git clone https://github.com/irfannaya/9router-freexzy.git
-cd 9router-freexzy
-
-# 2. Build and run with Docker Compose
-docker compose up -d --build
-```
-> 🎉 Dashboard opens instantly at **`http://localhost:20128`**! Data persists automatically in Docker volume `9router-data`.
-
-### 📦 Run from Source (Node.js 22.5+ or Bun)
-
-> ⚠️ **CRITICAL REQUIREMENT**: 9Router uses a SQLite database layer. Use **Node.js ≥ 22.5.0** (Node 22 LTS recommended) or **Bun**. Node.js ≥ 22.5 includes built-in `node:sqlite` out-of-the-box with **zero** C++ build tools required. Running on Node < 22.5 will trigger `[DB] No SQLite driver available (bun/better/node/sql.js all failed)` unless native build tools (`python`, `make`, `g++` / Visual C++) are installed.
-
-```bash
-# 1. Verify Node.js version (must be >= 22.5.0)
-node -v
-
-# 2. Clone repository & install dependencies
-git clone https://github.com/irfannaya/9router-freexzy.git
-cd 9router-freexzy
-npm install
-
-# 3. Build and run production server
-npm run build
-npm start
+npm install -g 9router
+9router
 ```
 
-#### 🛠️ Troubleshooting: `[DB] No SQLite driver available`
+🎉 Dashboard opens at `http://localhost:20128`
 
-If you encounter this error when connecting a provider or starting the app:
+**2. Connect a FREE provider (no signup needed):**
 
-1. **Option 1 (Recommended): Upgrade to Node.js 22.5+**
-   ```bash
-   # Via nvm:
-   nvm install 22
-   nvm use 22
-   npm start
-   ```
-2. **Option 2: Run via Bun (Instant native SQLite)**
-   ```bash
-   bun install
-   bun run dev:bun
-   ```
-3. **Option 3: Install `better-sqlite3` manually (requires C++ build tools)**
-   ```bash
-   npm install better-sqlite3
-   ```
-4. **Option 4: Run via Docker (Zero dependency worries)**
-   ```bash
-   docker compose up -d --build
-   ```
+Dashboard → Providers → Connect **Kiro AI** (~50 credits/month free: Claude 4.5 + GLM-5 + MiniMax) or **OpenCode Free** (no auth) → Done!
 
----
-
-### 🔌 Connect Providers & Use in Your Tools
+**3. Use in your CLI tool:**
 
 ```
 Claude Code/Codex/OpenClaw/Cursor/Cline Settings:
@@ -1584,8 +1528,6 @@ Thanks to all contributors who helped make 9Router better!
 
 Built on the shoulders of giants:
 
-- **[9Router](https://github.com/decolua/9router)** by **[@decolua](https://github.com/decolua)** — the original JavaScript router and token saver this custom distribution is built upon.
-- **[9router-mibp-version](https://github.com/mhiqrambg/9router-mibp-version)** by **[@mhiqrambg](https://github.com/mhiqrambg)** — Cline free-tier exploration and model catalog insights.
 - **[CLIProxyAPI](https://github.com/router-for-me/CLIProxyAPI)** — original Go implementation that inspired this JavaScript port.
 - **[RTK](https://github.com/rtk-ai/rtk)** ![Stars](https://img.shields.io/github/stars/rtk-ai/rtk?style=flat&color=yellow) — Rust token-saver. 9Router ports its compression pipeline to JS → **−20-40% input tokens** on every request.
 - **[Caveman](https://github.com/JuliusBrussee/caveman)** ![Stars](https://img.shields.io/github/stars/JuliusBrussee/caveman?style=flat&color=yellow) by **[@JuliusBrussee](https://github.com/JuliusBrussee)** — viral _"why use many token when few token do trick"_. 9Router adapts its prompt → **−65% output tokens**.

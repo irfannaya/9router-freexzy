@@ -32,7 +32,14 @@ export const UNSUPPORTED_SCHEMA_CONSTRAINTS = [
   "title", "optional", "deprecated", "if", "then", "else", "contentMediaType", "contentEncoding",
   // UI/Styling properties (from Cursor tools - NOT JSON Schema standard)
   "cornerRadius", "fillColor", "fontFamily", "fontSize", "fontWeight",
-  "gap", "padding", "strokeColor", "strokeThickness", "textColor"
+  "gap", "padding", "strokeColor", "strokeThickness", "textColor",
+  // Non-standard annotation/error keywords used by some MCP tool schemas (#4283).
+  // Gemini's schema proto has no field for these and rejects the whole request with
+  // "Unknown name X: Cannot find field" if any nested schema node carries them.
+  "errorMessage", "errorMessages", "x-errorMessage", "x-errorMessages",
+  "markdownDescription", "x-intellij-html-description",
+  "x-taplo-info", "x-taplo", "doNotSuggest", "suggestSortText",
+  "minProperties", "maxProperties"
 ];
 
 // Default safety settings
@@ -432,71 +439,37 @@ export function cleanJSONSchemaForAntigravity(schema) {
   return cleaned;
 }
 
-// Merge adjacent same-role messages, strip empty parts, ensure initial user turn,
-// and enforce Google Cloud Code API strict turn alternation for functionCall / functionResponse.
+// Merge adjacent same-role messages, strip empty parts, ensure initial and terminal user turns
 export function normalizeGeminiContents(contents) {
   const out = [];
   for (const c of contents || []) {
-    if (!c?.role || !Array.isArray(c.parts) || c.parts.length === 0) continue;
-    const validParts = c.parts.filter(p => p && (p.text !== undefined || p.functionCall || p.functionResponse || p.inlineData || p.thought || p.thoughtSignature));
-    if (validParts.length === 0) continue;
-    const prev = out.at(-1);
-    if (prev?.role === c.role) {
-      prev.parts.push(...validParts);
-    } else {
-      out.push({ role: c.role, parts: [...validParts] });
-    }
+    if (!c?.role || !Array.isArray(c.parts)) continue;
+    const parts = c.parts.filter(p => p && Object.keys(p).length > 0);
+    if (parts.length === 0) continue;
+    const last = out.at(-1);
+    if (last?.role === c.role) last.parts.push(...parts);
+    else out.push({ ...c, parts: [...parts] });
   }
-
-  // 1. Must start with user turn
   if (out.length > 0 && out[0].role !== "user") {
-    out.unshift({ role: "user", parts: [{ text: "Hello" }] });
+    out.unshift({ role: "user", parts: [{ text: "..." }] });
   }
-
-  // 2. Validate functionCall <-> functionResponse transitions
-  for (let i = 0; i < out.length; i++) {
-    const cur = out[i];
-    if (cur.role === "model") {
-      const fcs = cur.parts.filter(p => p.functionCall);
-      if (fcs.length > 0) {
-        if (i === 0) {
-          out.unshift({ role: "user", parts: [{ text: "Hello" }] });
-          i++;
-        }
-        let next = out[i + 1];
-        if (!next || next.role !== "user") {
-          const dummyParts = fcs.map(fc => ({
-            functionResponse: {
-              id: fc.functionCall.id || "call_default",
-              name: fc.functionCall.name || "unknown",
-              response: { result: "done" }
-            }
-          }));
-          out.splice(i + 1, 0, { role: "user", parts: dummyParts });
-          i++;
-        } else {
-          const respIds = new Set(next.parts.filter(p => p.functionResponse).map(p => p.functionResponse.id));
-          for (const fc of fcs) {
-            if (fc.functionCall.id && !respIds.has(fc.functionCall.id)) {
-              next.parts.unshift({
-                functionResponse: {
-                  id: fc.functionCall.id,
-                  name: fc.functionCall.name,
-                  response: { result: "done" }
-                }
-              });
-            }
-          }
-        }
-      }
+  if (out.length > 0 && out.at(-1).role === "model") {
+    const fnCalls = (out.at(-1).parts || []).filter(p => p && p.functionCall);
+    if (fnCalls.length > 0) {
+      const responses = fnCalls.map(p => {
+        const call = p.functionCall || {};
+        const fr = {
+          name: call.name || "tool",
+          response: { result: "Continue." }
+        };
+        if (call.id) fr.id = call.id;
+        return { functionResponse: fr };
+      });
+      out.push({ role: "user", parts: responses });
+    } else {
+      out.push({ role: "user", parts: [{ text: "Continue." }] });
     }
   }
-
-  // 3. Must end with user turn for generation
-  if (out.length > 0 && out.at(-1).role !== "user") {
-    out.push({ role: "user", parts: [{ text: "Continue" }] });
-  }
-
   return out;
 }
 
